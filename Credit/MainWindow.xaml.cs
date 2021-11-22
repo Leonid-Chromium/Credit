@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,6 +59,34 @@ namespace Credit
                 return obj;
             }
 
+
+        }
+        void EX2()
+        {
+            int Month = Convert.ToInt32(MonthTB.Text);
+            double[,] ex2TB = new double[Month, 4];
+            double Percent = Convert.ToDouble(YearPerTB.Text);
+            double PM = Percent / 12 / 100;
+            double PLT = Convert.ToDouble(PlatiTB.Text);
+            try
+            {
+                dataGrid.ItemsSource = null;
+                for (int i = 0; i < Month; i++)
+                {
+                    ex2TB[i, 0] = (PLT - Convert.ToInt32(MoneyTB.Text) * PM) * Math.Pow(1 + PM, i - 1);
+                    Trace.WriteLine(ex2TB[i, 0]);
+                    //dataGrid.Rows.Add(ex2TB[i, 0]);
+                }
+                DataTable dataTable = new DataTable();
+                dataTable.Rows.Add(ex2TB[,]);
+                dataGrid.ItemsSource = ex2TB[,];//
+
+                //DB_Payment.Rows[i + 1].Cells[1].Value = ex2TB[i, 0];
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+            }
 
         }
 
