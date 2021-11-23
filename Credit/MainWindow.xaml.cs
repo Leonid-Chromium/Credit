@@ -24,6 +24,12 @@ namespace Credit
     public partial class MainWindow : Window
     {
         bool Round;
+        double Percent;
+        double PM;
+        double KA;
+        double PLT;
+        double Money;
+        int Month;
 
         public MainWindow()
         {
@@ -38,12 +44,12 @@ namespace Credit
         
         public void Counting()
         {
-            double Money = Convert.ToDouble(MoneyTB.Text);
-            int Month = Convert.ToInt32(MonthTB.Text);
-            double Percent = Convert.ToDouble(YearPerTB.Text);
-            double PM = Percent / 12 / 100;
-            double KA = (PM * Math.Pow(1 + PM, Month)) / (Math.Pow(1 + PM, Month) - 1);
-            double PLT = KA * Money;
+            Money = Convert.ToDouble(MoneyTB.Text);
+            Month = Convert.ToInt32(MonthTB.Text);
+            Percent = Convert.ToDouble(YearPerTB.Text);
+            PM = Percent / 12 / 100;
+            KA = (PM * Math.Pow(1 + PM, Month)) / (Math.Pow(1 + PM, Month) - 1);
+            PLT = KA * Money;
           
             MonthPerTB.Text = Convert.ToString(Rounding(PLT));
             KATB.Text = Convert.ToString(Rounding(PLT * Month));
@@ -54,11 +60,7 @@ namespace Credit
 
         void DatagridFill()
         {
-            int Month = Convert.ToInt32(MonthTB.Text);
-            double Money = Convert.ToDouble(MoneyTB.Text);
-            double Percent = Convert.ToDouble(YearPerTB.Text);
-            double PM = Percent / 12 / 100;
-            double PLT = Convert.ToDouble(MonthPerTB.Text);
+            
 
             double Summ = 0;
 
