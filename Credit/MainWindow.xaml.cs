@@ -39,13 +39,54 @@ namespace Credit
         public void Counting()
         {
             double Money = Convert.ToDouble(MoneyTB.Text);
-            int M = Convert.ToInt32(MonthTB.Text);
-            double PM = Convert.ToDouble(YearPerTB.Text) / 12 / 100;
-            MonthPerTB.Text = Convert.ToString(Rounding(PM));
-            double KA = (PM * (Math.Pow((1 + PM), M))) / ((Math.Pow((1 + PM), M)) - 1);
-            KATB.Text = Convert.ToString(Rounding(KA));
+            int Month = Convert.ToInt32(MonthTB.Text);
+            double Percent = Convert.ToDouble(YearPerTB.Text);
+            double PM = Percent / 12 / 100;
+            double KA = (PM * Math.Pow(1 + PM, Month)) / (Math.Pow(1 + PM, Month) - 1);
             double PLT = KA * Money;
-            PlatiTB.Text = Convert.ToString(Rounding(PLT));
+          
+            MonthPerTB.Text = Convert.ToString(Rounding(PLT));
+            KATB.Text = Convert.ToString(Rounding(PLT * Month));
+            PlatiTB.Text = Convert.ToString(Rounding(Convert.ToDouble(KATB.Text) - Money));
+
+            DatagridFill();
+        }
+
+        void DatagridFill()
+        {
+            int Month = Convert.ToInt32(MonthTB.Text);
+            double Money = Convert.ToDouble(MoneyTB.Text);
+            double Percent = Convert.ToDouble(YearPerTB.Text);
+            double PM = Percent / 12 / 100;
+            double PLT = Convert.ToDouble(MonthPerTB.Text);
+
+            double Summ = 0;
+
+            double[,] valuesForDG = new double[Month, 5];
+
+            try
+            {
+                dataGrid.Items.Clear();
+
+                for (int i = 0; i < Month; i++)
+                {
+                    valuesForDG[i, 0] = i+1; // период
+                    valuesForDG[i, 1] = Rounding((PLT - Money * PM) * Math.Pow(1 + PM, i)); //ОСПЛТ
+                    valuesForDG[i, 2] = Rounding(PLT*(1-Math.Pow((1+ PM),i-Month)));//ПРПЛТ
+                    valuesForDG[i, 3] = Rounding(valuesForDG[i, 1] + valuesForDG[i, 2]); // сумма ОСПЛТ и ПРПЛТ
+                    Summ += valuesForDG[i, 1];
+                    valuesForDG[i, 4] = Rounding(Money - Summ); //сумма кредита + (первое значение ОСПЛТ + ОСПЛТ)
+
+                    dataGrid.Items.Add(new Columns { Column1 = valuesForDG[i, 0], Column2 = valuesForDG[i, 1], Column3 = valuesForDG[i, 2], Column4 = valuesForDG[i, 3], Column5 = valuesForDG[i, 4] });
+                }
+
+                dataGrid.AutoGenerateColumns = true;
+                dataGrid.CanUserAddRows = false;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+            }
         }
 
         public double Rounding(double obj)
@@ -56,38 +97,8 @@ namespace Credit
             }
             else
             {
-                return obj;
+                return Math.Round(obj, 2);
             }
-
-
-        }
-        void EX2()
-        {
-            int Month = Convert.ToInt32(MonthTB.Text);
-            double[,] ex2TB = new double[Month, 4];
-            double Percent = Convert.ToDouble(YearPerTB.Text);
-            double PM = Percent / 12 / 100;
-            double PLT = Convert.ToDouble(PlatiTB.Text);
-            try
-            {
-                dataGrid.ItemsSource = null;
-                for (int i = 0; i < Month; i++)
-                {
-                    ex2TB[i, 0] = (PLT - Convert.ToInt32(MoneyTB.Text) * PM) * Math.Pow(1 + PM, i - 1);
-                    Trace.WriteLine(ex2TB[i, 0]);
-                    //dataGrid.Rows.Add(ex2TB[i, 0]);
-                }
-                DataTable dataTable = new DataTable();
-                dataTable.Rows.Add(ex2TB[,]);
-                dataGrid.ItemsSource = ex2TB[,];//
-
-                //DB_Payment.Rows[i + 1].Cells[1].Value = ex2TB[i, 0];
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.Message);
-            }
-
         }
 
         private void EnterButton_Click(object sender, RoutedEventArgs e)
@@ -100,5 +111,14 @@ namespace Credit
             Round = Convert.ToBoolean(RoundCB.IsChecked);
             Counting();
         }
+    }
+
+    public class Columns
+    {
+        public double Column1 { get; set; }
+        public double Column2 { get; set; }
+        public double Column3 { get; set; }
+        public double Column4 { get; set; }
+        public double Column5 { get; set; }
     }
 }
